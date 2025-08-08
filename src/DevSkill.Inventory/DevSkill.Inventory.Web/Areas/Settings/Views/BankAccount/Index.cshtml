@@ -1,0 +1,203 @@
+﻿@{
+    ViewData["Title"] = "Bank Account Index";
+}
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <style>
+        .modal-header {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h3>Bank Accounts</h3>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bankAccountModal" id="addBankAccountBtn">
+            <i class="fa fa-plus"></i> New Bank Account
+        </button>
+    </div>
+
+    <table id="bankAccountsTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#SN</th>
+                <th>Account Name</th>
+                <th>Account No</th>
+                <th>Bank Name</th>
+                <th>Branch Name</th>
+                <th>Opening Balance</th>
+                <th>Current Balance</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="bankAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Bank Account Information</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="bankAccountForm">
+                <input type="hidden" name="id" id="bankAccountId">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Account Name *</label>
+                            <input type="text" class="form-control" name="accountName" id="accountName" required />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Account No *</label>
+                            <input type="text" class="form-control" name="accountNo" id="accountNo" required />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Bank Name *</label>
+                            <input type="text" class="form-control" name="bankName" id="bankName" required />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Branch Name</label>
+                            <input type="text" class="form-control" name="branchName" id="branchName" />
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Opening Balance</label>
+                            <input type="number" class="form-control" name="balance" id="balance" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i> Submit
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        let table;
+
+        $(document).ready(function () {
+            table = $('#bankAccountsTable').DataTable({
+                ajax: {
+                    url: '/Settings/BankAccount/GetBankAccountListJson',
+                    type: 'POST',
+                    contentType: "application/json",
+                    dataType: "json",
+                    data:function(d)
+                    {
+                        d.SearchItem={};
+                        return JSON.stringify(d);
+                     }
+                   },
+                   columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: 'accountName' },
+                    { data: 'accountNo' },
+                    { data: 'bankName' },
+                    { data: 'branchName' },
+                    { data: 'openingBalance' },
+                    { data: 'currentBalance' },
+                    {
+                        data: 'isActive',
+                        render: function (data) {
+                            return data ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data) {
+                            return `
+                                <button class="btn btn-sm btn-warning editBtn" data-id="${data.id}"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger deleteBtn" data-id="${data.id}"><i class="fa fa-trash"></i></button>
+                            `;
+                        },
+                        orderable: false
+                    }
+                ]
+            });
+
+            $('#addBankAccountBtn').click(function () {
+                $('#bankAccountForm')[0].reset();
+                $('#bankAccountId').val('');
+                $('#bankAccountModal').modal('show');
+            });
+            $('#bankAccountForm').submit(function (e) {
+
+              //  console.log("I am submitted");
+                e.preventDefault();
+
+                const formData = {
+                    Id: $('#bankAccountId').val(),
+                    AccountName: $('#accountName').val(),
+                    AccountNo: $('#accountNo').val(),
+                    BankName: $('#bankName').val(),
+                    BranchName: $('#branchName').val(),
+                    OpeningBalance: $('#balance').val()
+                };
+
+                $.ajax({
+                    url: '/Settings/BankAccount/Add',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function () {
+                        $('#bankAccountModal').modal('hide');
+                        table.ajax.reload();
+                    }
+                });
+            });
+
+            $('#bankAccountsTable').on('click', '.editBtn', function () {
+                const id = $(this).data('id');
+                $.get(`/Settings/BankAccount/Get/${id}`, function (data) {
+                    $('#bankAccountId').val(data.id);
+                    $('#accountName').val(data.accountName);
+                    $('#accountNo').val(data.accountNo);
+                    $('#bankName').val(data.bankName);
+                    $('#branchName').val(data.branchName);
+                    $('#balance').val(data.openingBalance);
+                    $('#bankAccountModal').modal('show');
+                });
+            });
+
+            $('#bankAccountsTable').on('click', '.deleteBtn', function () {
+                const id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this bank account?')) {
+                    $.ajax({
+                        url: `/Settings/BankAccount/Delete/${id}`,
+                        method: 'DELETE',
+                        success: function () {
+                            table.ajax.reload();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+
+

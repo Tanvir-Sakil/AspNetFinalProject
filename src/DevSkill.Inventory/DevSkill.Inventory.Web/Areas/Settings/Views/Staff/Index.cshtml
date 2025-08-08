@@ -1,0 +1,144 @@
+﻿@* @model StaffListModel *@
+@{
+    ViewData["Title"] = "Staff";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Staff</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Staff</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Staff List</h3>
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                    <i class="fas fa-plus"></i> New Staff
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="staffTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#SN.</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Joining Date</th>
+                            <th>Salary</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Staff Modal -->
+<partial name="_AddStaffModal" />
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+     <script>
+        $(function () {
+            let table = $('#staffTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '/Admin/Staff/GetStaffJsonData',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: function (d) {
+                        return JSON.stringify(d);
+                    }
+                },
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: "staffCode" },
+                    { data: "employeeName" },
+                    { data: "phone" },
+                    { data: "email" },
+                    { data: "address" },
+                    { data: "joiningDate" },
+                    { data: "salary" },
+                    {
+                        data: "status",
+                        render: data => data ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return `
+                                <button class='btn btn-info btn-sm' onclick="window.location.href='/admin/staff/edit/${data}'">
+                                    <i class='fas fa-pencil-alt'></i> Edit
+                                </button>
+                                <button class='btn btn-danger btn-sm delete-staff' data-id='${data}'>
+                                    <i class='fas fa-trash'></i> Delete
+                                </button>`;
+                        }
+                    }
+                ]
+            });
+
+            $('#staffTable').on('click', '.delete-staff', function () {
+                const id = $(this).data("id");
+                if (confirm("Are you sure to delete this staff?")) {
+                    $.post('/admin/staff/delete/' + id, () => table.ajax.reload());
+                }
+            });
+        });
+    </script> 
+
+    <script>
+        $(document).ready(function () {
+          // Load departments
+          $.getJSON('/Settings/Department/GetAllDepartments', function (data) {
+            let options = '<option value="">Select One</option>';
+            $.each(data, function (i, dept) {
+              options += `<option value="${dept.id}">${dept.name}</option>`;
+            });
+            $('#departmentDropdown').html(options);
+          });
+
+          // Submit form
+          $('#staffForm').submit(function (e) {
+            e.preventDefault();
+            console.log($(this).serialize());
+            $.ajax({
+              url: '/Admin/Staff/Add', // This should go to a CQRS-based controller
+              method: 'POST',
+              data: $(this).serialize(),
+              success: function () {
+                alert('Staff created successfully!');
+                $('#staffModal').modal('hide');
+                $('#staffTable').DataTable().ajax.reload();
+              }
+            });
+          });
+        });
+    </script>
+
+}
+

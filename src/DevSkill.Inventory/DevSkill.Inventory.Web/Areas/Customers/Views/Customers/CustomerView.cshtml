@@ -1,0 +1,184 @@
+﻿@* @model DevSkill.Inventory.Web.Areas.Admin.Models.CustomerViewModel
+<h2>Customer Info</h2>
+<div class="card p-3 mb-4">
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <img src="@Model.ImagePath" width="150" height="150" />
+    }
+
+    <p><strong>Name:</strong> @Model.Name</p>
+    <p><strong>Company:</strong> @Model.CompanyName</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Mobile:</strong> @Model.MobileNumber</p>
+    <p><strong>Address:</strong> @Model.Address</p>
+    <p><strong>Opening Balance:</strong> @Model.OpeningBalance</p>
+    <p><strong>Status:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
+</div>
+
+<h3>Invoices</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Invoice No</th>
+            <th>Date</th>
+            <th>Payment Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var invoice in Model.Sales)
+        {
+            <tr>
+                <td>@invoice.InvoiceNo</td>
+                <td>@invoice.Date.ToShortDateString()</td>
+                <td>@invoice.PaymentStatus</td>
+            </tr>
+        }
+    </tbody>
+</table> *@
+
+@model DevSkill.Inventory.Web.Areas.Customers.Models.CustomerViewModel
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Customer View</h3>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <!-- Left side: Image & Name -->
+            <div class="col-md-6 text-center mb-4">
+                <img src="@(!string.IsNullOrEmpty(Model.ImagePath) ? Model.ImagePath : "/img/default-profile.png")"
+                     class="rounded-circle border shadow"
+                     style="width: 60%; height: auto;" alt="Customer Image" />
+
+                <h3 class="mt-3"><b>@Model.Name</b></h3>
+            </div>
+
+            <!-- Right side: Info Table -->
+            <div class="col-md-6">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <td><b>Name</b></td>
+                            <td>@Model.Name</td>
+                        </tr>
+                        <tr style="background-color:#f2f2fa;">
+                            <td><b>ID</b></td>
+                            <td>@Model.CustomerID</td>
+                        </tr>
+                        <tr>
+                            <td><b>Company Name</b></td>
+                            <td>@Model.CompanyName</td>
+                        </tr>
+                        <tr style="background-color:#f2f2fa;">
+                            <td><b>Mobile</b></td>
+                            <td>@Model.MobileNumber</td>
+                        </tr>
+                        <tr>
+                            <td><b>Email</b></td>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr style="background-color:#f2f2fa;">
+                            <td><b>Address</b></td>
+                            <td>@Model.Address</td>
+                        </tr>
+                        <tr>
+                            <td><b>Opening Balance</b></td>
+                            <td>@Model.OpeningBalance</td>
+                        </tr>
+                        <tr style="background-color:#f2f2fa;">
+                            <td><b>Status</b></td>
+                            <td class="fw-bold">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="text-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <!-- Invoice List -->
+            <div class="col-md-6 mb-4">
+                <h5 class="mb-3"><i class="fas fa-file-invoice-dollar me-1"></i>Invoices</h5>
+                <table class="table table-bordered text-center table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Invoice No</th>
+                            <th>Date</th>
+                            <th>Payment Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Sales != null && Model.Sales.Any())
+                        {
+                            foreach (var invoice in Model.Sales)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="/Admin/Sales/View/@invoice.Id">@invoice.InvoiceNo</a>
+                                    </td>
+                                    <td>@invoice.Date.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @switch (invoice.PaymentStatus.ToLower())
+                                        {
+                                            case "fullpaid":
+                                                <span class="text-success fw-bold">PAID</span>
+                                                break;
+                                            case "partiallypaid":
+                                                <span class="text-primary fw-bold">PARTIAL PAID</span>
+                                                break;
+                                            default:
+                                                <span class="text-danger fw-bold">@invoice.PaymentStatus.ToUpper()</span>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3">No invoices available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Optional: Transactions (for now we'll leave a placeholder) -->
+            <div class="col-md-6 mb-4">
+                <h5 class="mb-3"><i class="fas fa-exchange-alt me-1"></i>Transactions</h5>
+                <table class="table table-bordered text-center table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Transaction</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">No transactions to show.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="/Customers" class="btn btn-warning text-white">
+                <i class="fa fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>

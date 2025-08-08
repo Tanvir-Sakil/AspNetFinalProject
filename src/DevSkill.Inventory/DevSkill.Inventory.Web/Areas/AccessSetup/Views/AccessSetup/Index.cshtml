@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "Access Setup";
+}
+
+@section Styles{
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css" />
+}
+
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Access Setup</h3>
+        </div>
+        <div class="card-body">
+            <table id="accessSetupTable" class="table table-bordered table-hover table-striped w-100">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#SN.</th>
+                        <th>Company Name</th>
+                        <th>User Name</th>
+                        <th>User Role</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#accessSetupTable').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All']
+            ],
+            layout: {
+                topStart: ['pageLength', 'buttons'],
+                topEnd: 'search'
+            },
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            ajax: {
+                url: '/AccessSetup/GetUserList',
+                type: 'GET'
+            },
+            columns: [
+                {
+                    data: null,
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                    orderable: false
+                },
+                { data: 'companyName' },
+                { data: 'userName' },
+                { data: 'userType' },
+                {
+                    data: 'status',
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge bg-success">Active</span>'
+                            : '<span class="badge bg-danger">Inactive</span>';
+                    }
+                },
+                {
+                    data: 'createdDate',
+                    render: function (data) {
+                        const date = new Date(data);
+                        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                    }
+                },
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return `
+                            <a href="/Admin/Admin/AssignPermissions?userId=${data}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        `;
+                    },
+                    orderable: false
+                }
+            ]
+        });
+    });
+</script>
+}

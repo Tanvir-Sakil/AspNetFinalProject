@@ -1,0 +1,404 @@
+﻿@using DevSkill.Web.Areas.Customers.Models
+@model CustomerListModel
+
+@{
+    ViewData["Title"] = "Customers";
+}
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <style>
+        .page-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 2rem auto;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .app-content-header {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            padding: 20px;
+            border-radius: 10px;
+            color: #fff;
+            margin-bottom: 25px;
+        }
+
+        .app-content-header h3 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .breadcrumb-item a {
+            color: #d1ecf1;
+        }
+
+        .btn-add-customer {
+            background: linear-gradient(45deg, #28a745, #218838);
+            border: none;
+            font-weight: 600;
+            padding: 0.5rem 1.3rem;
+            font-size: 0.95rem;
+            color: #fff;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-add-customer:hover {
+                background: linear-gradient(45deg, #218838, #1e7e34);
+                box-shadow: 0 6px 12px rgba(30, 126, 52, 0.5);
+                transform: translateY(-1px);
+            }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #2c3e50;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table.dataTable thead th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        table.dataTable tbody td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #e6f0ff;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+            table-layout: auto;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.4em 0.8em;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .card.search-box {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background: #dce3ed; 
+        }
+
+            .card.search-box h5 {
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background: linear-gradient(45deg, #0056b3, #004080);
+            }
+
+        .dropdown-menu {
+            z-index: 1060 !important;
+        }
+
+        @@media (max-width: 576px) {
+            .btn-add-customer {
+                width: 100%;
+                margin-top: 1rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+
+    </style>
+}
+
+<div class="page-container">
+    <div class="app-content-header mb-4 d-flex justify-content-between align-items-center flex-wrap">
+        <h3><i class="fas fa-users me-2"></i> Customers</h3>
+    </div>
+
+    <div class="card search-box mb-4">
+        <div class="card-header bg-transparent border-0 pb-0">
+            <h5><i class="fas fa-search me-2"></i> Search Customers</h5>
+        </div>
+        <div class="card-body pt-1">
+            <div class="row">
+                <div class="col-sm-4 col-md-3 mb-3">
+                    <label class="fw-semibold form-label">Name</label>
+                    <input type="text" asp-for="SearchItem.Name" class="form-control" placeholder="Enter name..." />
+                </div>
+                <div class="col-sm-4 col-md-3 mb-3">
+                    <label class="fw-semibold form-label">Email</label>
+                    <input type="text" asp-for="SearchItem.Email" class="form-control" placeholder="Enter email..." />
+                </div>
+                <div class="col-sm-4 col-md-3 mb-3">
+                    <label class="fw-semibold form-label">Balance From</label>
+                    <input type="number" asp-for="SearchItem.BalanceFrom" class="form-control" placeholder="Min balance..." />
+                </div>
+                <div class="col-sm-4 col-md-3 mb-3">
+                    <label class="fw-semibold form-label">Balance To</label>
+                    <input type="number" asp-for="SearchItem.BalanceTo" class="form-control" placeholder="Max balance..." />
+                </div>
+            </div>
+
+        <div class="card-footer bg-transparent border-0 pt-0">
+            <button id="searchButton" type="submit" class="btn btn-primary float-end">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex align-items-center flex-wrap justify-content-between">
+            <h3 class="card-title mb-0">
+                <i class="fas fa-users me-2 text-primary"></i> Available Customers
+            </h3>
+            <div class="ms-auto">
+                <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                    <i class="fas fa-user-plus me-1"></i> Add Customer
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <partial name="_ResponsePartial" />
+            <partial name="_ModalPartial" />
+            <partial name="_AddCustomerModal" />
+            <div id="editCustomerModalContainer"></div>
+            <div class="table-responsive">
+                <table id="customers" class="table table-bordered table-striped table-hover w-100">
+                    <thead>
+                        <tr>
+                            <th>#SN.</th>
+                            <th>Image</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Current Balance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>#SN.</th>
+                            <th>Image</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Address</th>
+                            <th>Email</th>
+                            <th>Current Balance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(function () {
+            let table = $("#customers").DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: false,
+                scrollX: true,
+                autoWidth: false,
+                dom: '<"top d-flex justify-content-between"lB>rt<"bottom"ip>',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
+                ajax: {
+                    url: "/Customers/GetCustomerJsonData",
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: function (d) {
+                            d.Name = $("#SearchItem_Name").val();
+                            d.Email = $("#SearchItem_Email").val();
+                            d.BalanceFrom = $("#SearchItem_BalanceFrom").val() || null;
+                            d.BalanceTo = $("#SearchItem_BalanceTo").val() || null;
+                        return JSON.stringify(d);
+                       }     
+                },
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    {
+                        data: "imagePath",
+                        render: function (data) {
+                        if (!data) return "No Image";
+                        const fileName = data.split("/").pop();
+                        return `<img src="${data}" style="height: 50px;" class="rounded-circle border border-2" />`;
+                    }
+                    },
+                    { data: "customerID" },
+                    { data: "name" },
+                    { data: "mobileNumber" },
+                    { data: "address" },
+                    { data: "email" },
+                    { data: "openingBalance" },
+                    {
+                        data: "status",
+                        render: function (data) {
+                            return data
+                                ? '<span class="badge badge-status bg-success text-white">Active</span>'
+                                : '<span class="badge badge-status bg-danger text-white">Inactive</span>';
+                        }
+                    },
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return `
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">Action</button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="/customers/view/${data}"><i class="fas fa-eye me-2"></i>View</a>
+                                         <button class="dropdown-item text-primary edit-customer-btn" data-id="${data}"><i class="fas fa-edit me-2"></i>Edit</button></li>
+                                        <a class="dropdown-item" href="/Ledger"><i class="fas fa-file-invoice me-2"></i>Ledger</a>
+                                        <button class="dropdown-item text-danger show-bs-modal" data-id="${data}"><i class="fas fa-trash me-2"></i>Delete</button>
+                                    </div>
+                                </div>`;
+                        }
+                    }
+                ]
+            });
+
+              $(document).on('click', '.dropdown-toggle', function (e) {
+                e.stopPropagation();
+                const $currentMenu = $(this).next('.dropdown-menu');
+                $('.dropdown-menu').not($currentMenu).removeClass('show');
+                 $currentMenu.toggleClass('show');
+            });
+
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown-menu').removeClass('show');
+                }
+            });
+
+          $('#searchButton').click(() => table.ajax.reload(null, false));
+         $('#customers').on('click', '.show-bs-modal', function () {
+            let id = $(this).data("id");
+
+             $('#delete-confirmation-content').show();
+            $('#delete-success-message').addClass('d-none').hide();
+
+            $('#modal-delete .modal-body p').text("Are you sure to delete this customer?");
+            $('#delete-form').attr('action', '/customers/delete/' + id);
+
+            var modalElement = document.getElementById('modal-delete');
+            var modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        });
+        $('#delete-button').on('click', function () {
+            $('#delete-form').submit();
+        });
+        $('#delete-form').on('submit', function (e) {
+            e.preventDefault();
+            var actionUrl = $(this).attr('action');
+            $.post(actionUrl)
+                .done(function (response) {
+
+                    var modalElement = document.getElementById('modal-delete');
+                    var modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+                    table.ajax.reload(null, false);
+                    alert("Customer deleted successfully.");
+                    
+                })
+                .fail(function () {
+                    alert("Failed to delete customer.");
+                });
+        });
+
+            $(document).on('click', '.edit-customer-btn', function () {
+            const customerID = $(this).data("id");
+
+            $.ajax({
+                url: `/customers/edit/${customerID}`,
+                type: 'GET',
+                success: function (html) {
+                    $('#editCustomerModalContainer').html(html);
+                    const modal = new bootstrap.Modal(document.getElementById('editcustomerModal'));
+                    modal.show();
+                },
+                error: function () {
+                    alert("Failed to load customer data.");
+                }
+            });
+        });
+
+                   $(document).on('submit', '#editCustomerForm', function (e) {
+                    e.preventDefault();
+                    var formData = new FormData(this);
+
+                    $.ajax({
+                        url: '/Customers/Update',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            alert('Customer Update successfully.');
+                                bootstrap.Modal.getInstance(document.getElementById('editcustomerModal')).hide();
+                            table.ajax.reload();
+                        },
+                        error: function (xhr) {
+                            alert(xhr.responseJSON?.message || 'Failed to Update Customer.');
+                        }
+                    });
+                });
+
+        });
+    </script>
+}

@@ -1,0 +1,77 @@
+﻿@using DevSkill.Inventory.Domain.Dtos
+@model ProductDto
+@{
+    ViewData["Title"] = "Product View";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Product View</h3>
+    </div>
+
+    <div class="card-body">
+        <div class="row d-flex align-items-center">
+            <div class="col-md-4 col-sm-4 col-12 text-center">
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <img src="@Model.ImagePath" alt="Product Image" class="img-fluid" style="max-height: 200px;" />
+                }
+                else
+                {
+                    <i class="fa fa-shopping-cart fa-5x"></i>
+                }
+            </div>
+
+            <div class="col-md-8 col-sm-8 col-12">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Product Name</td>
+                            <td>@Model.Name</td>
+                        </tr>
+                        <tr>
+                            <td>Product Code</td>
+                            <td>@Model.Code</td>
+                        </tr>
+                        <tr>
+                            <td>Category Name</td>
+                            <td>@(Model.CategoryName ?? "N/A")</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Price</td>
+                            <td>@Model.PurchasePrice.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td>MRP Price</td>
+                            <td>@Model.MRPPrice.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td>Wholesale Price</td>
+                            <td>@Model.WholesalePrice.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td>Low Stock</td>
+                            <td>@Model.LowStock</td>
+                        </tr>
+                        <tr>
+                            <td>Product Stock</td>
+                            <td>@Model.Stock</td>
+                        </tr>
+                        <tr>
+                            <td>Unit Name</td>
+                            <td>@(Model.Unit ?? "N/A")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-12 text-center mt-3">
+            <a asp-action="Index" asp-controller="Products" class="btn btn-danger">
+                <i class="fa fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+
+

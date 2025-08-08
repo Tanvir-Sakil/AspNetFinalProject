@@ -1,0 +1,206 @@
+﻿@using DevSkill.Inventory.Web.Areas.Customers.Models
+@model CustomerLedgerReportViewModel
+
+<!-- Font Awesome CDN -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<!-- Bootstrap (Optional if already loaded globally) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+   /* Print Styling */
+   @@media print {
+    body *
+    {
+        visibility: hidden;
+    }
+
+    #print, #print * {
+        visibility: visible;
+    }
+
+    #print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    #printBtn {
+        display: none;
+    }
+
+    }
+
+    .ledger-header {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+        .ledger-header h3 {
+            font-size: 24px;
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+
+    .company-info, .customer-info {
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+        .company-info b, .customer-info b {
+            color: #333;
+        }
+
+    table th, table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .signature-box {
+        margin-top: 40px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+        .signature-box p {
+            margin: 10px 0 0;
+        }
+
+    .table th {
+        background-color: #f0f4f8;
+        color: #000;
+    }
+
+    .table tfoot th {
+        background-color: #e2e8f0;
+    }
+
+    .print-btn {
+        margin: 10px 0;
+        float: right;
+    }
+</style>
+
+
+<div id="print">
+    <div class="row" id="header">
+        <div class="col-2 mt-3">
+            <img src='https: //sunshine-it.com/demo/inventory/upload/company/Sunshine_Logo_2.png' style="width: 100%;" />
+        </div>
+        <div class="col-8 text-center mt-2">
+            <h3><b>@Model.CompanyProfile.CompanyName</b></h3>
+            <div class="company-info">
+                <div><b>Address:</b> @Model.CompanyProfile.Address</div>
+                <div><b>Email:</b> @Model.CompanyProfile.Email</div>
+                <div><b>Mobile:</b> @Model.CompanyProfile.Mobile</div>
+            </div>
+        </div>
+        <div class="col-2 mt-3 text-end">
+            <div><b>Date:</b><br /> @DateTime.Now.ToString("dd-MM-yyyy hh:mm tt")</div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="customer-info">
+        <b>Customer Name:</b> @Model.CustomerName <br />
+        <b>Address:</b> @Model.Address <br />
+        <b>Contact No:</b> @Model.ContactNo <br />
+    </div>
+
+    <div class="ledger-header">
+        <h3><i class="fas fa-book"></i> Customer Ledger Reports in: @Model.ReportYear</h3>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="d-none">#SN.</th>
+                <th>Date</th>
+                <th>Invoice</th>
+                <th>Particulars</th>
+                <th>Total</th>
+                <th>Discount</th>
+                <th>Vat</th>
+                <th>Paid</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Transactions.Any())
+            {
+                int sn = 1;
+                foreach (var item in Model.Transactions)
+                {
+                    <tr>
+                        <td class="d-none">@sn</td>
+                        <td>@item.Date.ToString("dd-MM-yyyy")</td>
+                        <td>@item.Invoice</td>
+                        <td>@item.Particulars</td>
+                        <td>@item.Total.ToString("N2")</td>
+                        <td>@item.Discount.ToString("N2")</td>
+                        <td>@item.Vat.ToString("N2")</td>
+                        <td>@item.Paid.ToString("N2")</td>
+                        <td>@item.Balance.ToString("N2")</td>
+                    </tr>
+                    sn++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="9" class="text-center">No records found.</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" style="text-align:right;">Grand Total</th>
+                <th>@Model.Transactions.Sum(t => t.Total).ToString("N2")</th>
+                <th>@Model.Transactions.Sum(t => t.Discount).ToString("N2")</th>
+                <th>@Model.Transactions.Sum(t => t.Vat).ToString("N2")</th>
+                <th>@Model.Transactions.Sum(t => t.Paid).ToString("N2")</th>
+                <th>@Model.Transactions.Sum(t => t.Balance).ToString("N2")</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="row signature-box">
+        <div class="col-md-4">
+            <p>------------------------------</p>
+            <p>Prepared By</p>
+        </div>
+        <div class="col-md-4">
+            <p>------------------------------</p>
+            <p>Verified By</p>
+        </div>
+        <div class="col-md-4">
+            <p>------------------------------</p>
+            <p>Authorized By</p>
+        </div>
+    </div>
+</div>
+<div class="row no-print mt-4 text-center">
+    <div class="col-12">
+        <a href="javascript:void(0)" class="btn btn-primary me-2" onclick="printDiv('print')">
+            <i class="fas fa-print"></i> Print
+        </a>
+        <a href="@Url.Action("Index", "Customers")" class="btn btn-danger">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function printDiv(divId) {
+            const printContents = document.getElementById(divId).innerHTML;
+            const originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+            location.reload();
+        }
+    </script>
+}

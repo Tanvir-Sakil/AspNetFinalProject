@@ -1,0 +1,74 @@
+﻿@using DevSkill.Inventory.Web.Areas.Products.Models
+@model BarcodePrintViewModel
+@{
+    ViewData["Title"] = "Barcode Generator";
+}
+
+<div class="container mt-4">
+    <form id="barcodeForm">
+        <input type="hidden" name="code" value="@Html.Encode(Model.Code)" />
+        <input type="hidden" name="name" value="@Html.Encode(Model.Name)" />
+        <input type="hidden" name="price" value=@Model.Price />
+
+        <div class="row">
+            <div class="col-md-4">
+                <label>Number of Print *</label>
+                <input type="number" name="count" id="count" class="form-control" required />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-info">
+                    <i class="fa fa-search-plus"></i> Generate
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div id="barcodePreview" class="mt-4"></div>
+
+    <div class="text-center mt-3">
+        <button id="printBtn" style="display:none;" onclick="printDiv('printArea')">Print</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("barcodeForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            console.log("Submitting...");
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('/Products/RenderBarcodeLabels', {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    console.error("Server error:", error);
+                    alert("Failed to generate barcode preview.");
+                    return;
+                }
+
+                const html = await response.text();
+         document.getElementById("barcodePreview").innerHTML = html;
+
+         document.getElementById("printBtn").style.display = "inline-block";
+            } catch (error) {
+                console.error("JS fetch error:", error);
+                alert("Something went wrong.");
+            }
+        });
+        </script>
+        <script>
+                function printDiv(divId) {
+                var printContents = document.getElementById(divId).innerHTML;
+                var originalContents = document.body.innerHTML;
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+                location.reload();
+            }
+        </script>
+}
+

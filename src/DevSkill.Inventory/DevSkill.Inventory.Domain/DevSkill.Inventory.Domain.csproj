@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Expenses\Commands\" />
+    <Folder Include="Features\MobileAccount\Commands\" />
+    <Folder Include="Features\BankAccount\Commands\" />
+    <Folder Include="Features\UserRoles\Commands\" />
+    <Folder Include="Features\Departments\Commands\" />
+    <Folder Include="Features\Categories\Commands\" />
+    <Folder Include="Features\CashAccount\Commands\" />
+    <Folder Include="Features\Units\Commands\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+  </ItemGroup>
+
+</Project>

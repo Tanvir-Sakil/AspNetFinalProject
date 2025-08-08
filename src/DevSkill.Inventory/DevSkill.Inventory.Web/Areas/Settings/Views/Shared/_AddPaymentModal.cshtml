@@ -1,0 +1,65 @@
+﻿
+
+
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white py-2">
+                <h5 class="modal-title" id="paymentModalLabel"><i class="fas fa-wallet me-2"></i>Due Payment</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="paymentForm" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="dueAmount">Due Amount</label>
+                        <input type="text" class="form-control" name="damount" id="dueAmount" readonly>
+                    </div>
+
+                    <input type="hidden" name="pamount" id="pamount" value="0">
+
+                    <div class="form-group">
+                        <label for="payamount">Paid Amount <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" name="amount" id="payAmount" placeholder="Enter amount" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountType">Account Type <span class="text-danger">*</span></label>
+                        <select class="form-control select2" name="accountType" id="accountType" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank">Bank</option>
+                            <option value="Mobile">Mobile</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountNo">Account No <span class="text-danger">*</span></label>
+                        <select class="form-control select2" name="accountNo" id="accountNo" required>
+                            <option value="2">SD Cash</option>
+                            <option value="4">SD Cash2</option>
+                            <option value="11">IMPREST ACCT</option>
+                            <option value="12">ToB Cash</option>
+                            <option value="13">jk</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="note">Note</label>
+                        <textarea class="form-control" name="note" id="note" rows="2" placeholder="Optional note..."></textarea>
+                    </div>
+
+                    <input type="hidden" id="saleID" name="saleID" value="100">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success" id="pbsubmit">
+                        <i class="fas fa-paper-plane"></i> Submit
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,362 @@
+﻿@using DevSkill.Web.Areas.BalanceTransfers.Models
+
+@model BalanceTransferListModel
+
+@{
+    
+    ViewData["Title"] = "Balance Transfers";
+}
+@section Styles{
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css" />
+
+<style>
+    .page-container {
+        max-width: 1100px;
+        margin: 6px 6px;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #28a745, #218838);
+        border: none;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+        box-shadow: 0 4px 8px rgb(40 167 69 / 0.4);
+        transition: background 0.3s ease;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #218838, #1e7e34);
+            box-shadow: 0 6px 12px rgb(30 126 52 / 0.6);
+        }
+    table.dataTable thead th {
+        background-color: #007bff;
+        color: white;
+        font-weight: 600;
+        border-bottom: none;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    table.dataTable tbody tr:hover {
+        background-color: #d0e7ff;
+        cursor: pointer;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        margin-top: 1rem;
+        padding:1px;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+    }
+
+    #transfersTable_wrapper {
+            padding: 10px;
+     }
+    .modal-header {
+        background: #007bff;
+        color: white;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: none;
+    }
+
+    .modal-body label {
+        font-weight: 600;
+        color: #34495e;
+    }
+
+    @@media (max-width: 575.98px) {
+        .modal-dialog
+
+    {
+        margin: 1rem;
+    }
+
+    }
+</style>
+}
+
+<div class="page-container">
+    <h2>Balance Transfers</h2>
+
+    <button class="btn btn-success mb-3 show-bs-modal">
+        <i class="fa fa-exchange-alt me-2"></i> New Transfer
+    </button>
+
+    <div class="card search-box mb-4">
+        <div class="card-header bg-transparent border-0 pb-0">
+            <h5><i class="fas fa-search me-2"></i> Search Transfers</h5>
+        </div>
+        <div class="card-body pt-1">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="fw-semibold">From Account</label>
+                    <input type="text" asp-for="SearchItem.FromAccountName" id="searchFromAccount" class="form-control" placeholder="Enter from account..." />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="fw-semibold">To Account</label>
+                    <input type="text" asp-for="SearchItem.ToAccountName"  id="searchToAccount" class="form-control" placeholder="Enter to account..." />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="fw-semibold">Date From</label>
+                    <input type="date" asp-for="SearchItem.DateFrom" id="searchFromDate" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="fw-semibold">Date To</label>
+                    <input type="date" asp-for="SearchItem.DateTo" id="searchToDate" class="form-control" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="fw-semibold">Amount From</label>
+                    <input type="number" asp-for="SearchItem.AmountFrom" step="0.01" id="searchMinAmount" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="fw-semibold">Amount To</label>
+                    <input type="number" asp-for="SearchItem.AmountTo" step="0.01" id="searchMaxAmount" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-transparent border-0 pt-0">
+            <button id="searchTransfers" class="btn btn-primary float-end">
+                <i class="fas fa-search me-1"></i> Search
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="transfersTable" class="table table-bordered table-hover table-striped table-sm align-middle">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#SN</th>
+                    <th style="width: 15%;">Date</th>
+                    <th style="width: 20%;">From Account</th>
+                    <th style="width: 20%;">To Account</th>
+                    <th style="width: 15%;">Transfer Amount</th>
+                    <th>Note</th>
+                    <th style="width: 10%;">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <partial name="_BalanceTransferModal" />
+    <partial name="_ModalPartial" />
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#transfersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                lengthChange: true,
+                autoWidth: false,
+                responsive: true,
+                dom: '<"top d-flex justify-content-between"lB>rt<"bottom"ip>',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
+                ajax: {
+                    url: '/BalanceTransfers/GetTransfers',
+                    type: 'POST',
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: function (d) {
+                        d.FromAccountName = $("#SearchItem_FromAccountName").val();
+                        d.ToAccountName = $("#SearchItem_ToAccountName").val();
+                        d.AmountFrom = $("#SearchItem_AmountFrom").val()|| null;
+                        d.AmountTo = $("#SearchItem_AmountTo").val() || null;
+                        d.DateFrom = $("#SearchItem_DateFrom").val();
+                        d.DateTo = $("#SearchItem_DateTo").val();
+                        return JSON.stringify(d);
+                       }
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                        data: 'createdAt',
+                        render: function (data) {
+                            return new Date(data).toLocaleDateString('en-GB');
+                        }
+                    },
+                    { data: 'fromAccountName' },
+                    { data: 'toAccountName' },
+                    {
+                        data: 'amount',
+                        render: $.fn.dataTable.render.number(',', '.', 2, '$') 
+                    },
+                    { data: 'note' },
+                    {
+                        data: 'id',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: function (data) {
+                            return `<button class="btn btn-sm btn-danger show-bs-modal" data-id="${data}">Delete</button>`;
+                        }
+                    }
+                ],
+            });
+        });
+
+        $(document).ready(function () {
+            $('.show-bs-modal').on('click', function () {
+                const modalElement = document.getElementById('transferModal');
+                const transferModal = new bootstrap.Modal(modalElement);
+                transferModal.show();
+
+                clearTransferModal();
+                loadAccountTypes();
+            });
+
+            function clearTransferModal() {
+                $('#fromAccountType').val(null).trigger('change');
+                $('#fromAccountNo').empty().append('<option disabled selected>Select Account No.</option>');
+                $('#toAccountType').val(null).trigger('change');
+                $('#toAccountNo').empty().append('<option disabled selected>Select Account No.</option>');
+                $('#transferAmount').val('');
+                $('#transferNote').val('');
+            }
+
+            function loadAccountTypes() {
+                $.get('/Settings/BalanceAccount/GetAccountTypes', function (types) {
+                    ['#fromAccountType', '#toAccountType'].forEach(selector => {
+                        const $sel = $(selector);
+                        $sel.empty().append('<option disabled selected>Select Account Type</option>');
+                        types.forEach(t => {
+                            $sel.append(`<option value="${t.id}" data-name="${t.text}">${t.text}</option>`);
+                        });
+                    });
+                }).fail(() => alert("Failed to load account types."));
+            }
+
+            $('#fromAccountType').on('change', function () {
+                const selectedName = $(this).find(':selected').data('name');
+                loadAccounts(selectedName, '#fromAccountNo');
+            });
+
+            $('#toAccountType').on('change', function () {
+                const selectedName = $(this).find(':selected').data('name');
+                loadAccounts(selectedName, '#toAccountNo');
+            });
+
+            function loadAccounts(accountTypeName, targetSelector) {
+                if (!accountTypeName) return;
+                const url = `/Settings/${accountTypeName}Account/GetAllAccounts`;
+                $.get(url, function (accounts) {
+                    const $sel = $(targetSelector);
+                    $sel.empty().append('<option disabled selected>Select Account No.</option>');
+                    accounts.forEach(a => {
+                        $sel.append(`<option value="${a.id}">${a.name}</option>`);
+                    });
+                }).fail(() => alert("Error loading accounts for " + accountTypeName));
+            }
+
+            $('#submitTransfer').on('click', function () {
+                const payload = {
+                    FromAccountType: $('#fromAccountType').find(':selected').data('name'),
+                    FromAccountId: $('#fromAccountNo').val(),
+                    ToAccountType: $('#toAccountType').find(':selected').data('name'),
+                    ToAccountId: $('#toAccountNo').val(),
+                    Amount: parseFloat($('#transferAmount').val()),
+                    Note: $('#transferNote').val()
+                };
+
+                if (!payload.FromAccountId || !payload.ToAccountId || isNaN(payload.Amount) || payload.Amount <= 0) {
+                    alert("Please fill all required fields correctly.");
+                    return;
+                }
+
+                const $btn = $(this);
+                $btn.prop('disabled', true);
+
+                $.ajax({
+                    url: '/BalanceTransfer/Add',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function (res) {
+                        alert(res.message || 'Transfer successful!');
+                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById('transferModal'));
+                        modalInstance.hide();
+                        $('#transfersTable').DataTable().ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON?.message || 'Transfer failed.');
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
+        });
+
+         $('#transfersTable').on('click', '.show-bs-modal', function () {
+            let id = $(this).data("id");
+            console.log("The delete id is ", id);
+            $('#modal-delete .modal-body p').text("Are you sure to delete this customer?");
+            $('#delete-form').attr('action', '/BalanceTransfers/delete/' + id);
+
+            var modalElement = document.getElementById('modal-delete');
+            var modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        });
+        $('#delete-button').on('click', function () {
+            $('#delete-form').submit();
+        });
+        $('#delete-form').on('submit', function (e) {
+            e.preventDefault();
+            var actionUrl = $(this).attr('action');
+            $.post(actionUrl)
+                .done(function (response) {
+                    var modalElement = document.getElementById('modal-delete');
+                    var modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+                    var table = $('#transfersTable').DataTable();
+                    table.ajax.reload(null, false);
+                    alert("Transfer deleted successfully .");
+                })
+                .fail(function () {
+                    alert("Failed to delete Transfer.");
+                });
+        });
+    </script>
+}

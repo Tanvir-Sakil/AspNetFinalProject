@@ -1,0 +1,26 @@
+﻿<div class="modal fade" id="supplierModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="supplierForm">
+                <div class="modal-header">
+                    <h4 class="modal-title">Supplier Information</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-2" name="SupplierName" placeholder="Supplier Name" required />
+                    <input type="text" class="form-control mb-2" name="Mobile" placeholder="Mobile" required maxlength="11" minlength="11" />
+                    <input type="text" class="form-control mb-2" name="Company" placeholder="Company" />
+                    <input type="email" class="form-control mb-2" name="Email" placeholder="Email" />
+                    <input type="text" class="form-control mb-2" name="Address" placeholder="Address" />
+                    <input type="text" class="form-control mb-2" name="OpeningBalance" placeholder="Opening Balance" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-danger" data--bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

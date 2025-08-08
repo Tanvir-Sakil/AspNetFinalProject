@@ -1,0 +1,676 @@
+﻿@using DevSkill.Inventory.Web.Areas.Products.Models
+
+@model ProductListModel
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+
+        .page-container {
+            max-width: 100%;
+            width: 100%;
+            margin: 2rem auto;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .app-content-header {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            padding: 20px;
+            color: #fff;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+            .app-content-header h3 {
+                font-weight: 700;
+                margin: 0;
+            }
+
+        .breadcrumb-item a {
+            color: #d1ecf1;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .table-responsive {
+            overflow-x: hidden !important;
+            overflow-y: visible !important;
+            position:relative;
+            z-index: 0;
+        }
+
+        table.dataTable thead th {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        table.dataTable tbody td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #d0e7ff;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+            table-layout: auto;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.4em 0.8em;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #218838);
+            border: none;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+        }
+
+            .btn-success:hover {
+                background: linear-gradient(45deg, #218838, #1e7e34);
+                box-shadow: 0 6px 12px rgba(30, 126, 52, 0.6);
+            }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+            box-shadow: 0 2px 6px rgba(13, 110, 253, 0.4);
+        }
+
+            .btn-primary:hover {
+                background-color: #0b5ed7;
+            }
+
+        .badge {
+            padding: 0.45em 0.65em;
+            font-size: 0.75em;
+            font-weight: 600;
+            border-radius: 0.4rem;
+        }
+
+        .card.search-box {
+            background-color: #e9f7ef;
+            border: 1px solid #d1e7dd;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .badge.bg-success {
+            background-color: #28a745 !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+         .dropdown-menu {
+            position:absolute !important;
+            z-index: 1000 !important;
+            top: 100%;
+            left: 0;
+            transform: translateY(0px);
+        }
+
+        @@media (max-width: 576px) {
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .search-box {
+                padding: 1rem 0.5rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+}
+
+<div class="page-container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2>📦 Product Management</h2>
+        <button class="btn btn-primary show-bs-modal open-store-modal" data-bs-toggle="modal">
+            <i class="fas fa-warehouse me-1"></i> Store Product
+        </button>
+        <button class="btn btn-danger show-bs-modal open-damage-modal" data-bs-toggle="modal">
+            <i class="fas fa-tools me-1"></i> Damage Product
+        </button>
+        <button class="btn btn-success open-add-modal" data-bs-toggle="modal">
+            <i class="fas fa-plus me-1"></i> Add Product
+        </button>
+    </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary">
+            <i class="fas fa-search me-2"></i> Search Product
+        </div>
+        <div class="card-body">
+            <partial name="_ResponsePartial" />
+            <form id="searchForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Name</label>
+                        <input type="text" asp-for="SearchItem.Name" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Category Name</label>
+                        <input type="text" asp-for="SearchItem.CategoryName" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">MRP Price From</label>
+                        <input type="number" asp-for="SearchItem.MRPPriceFrom" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">MRP Price To</label>
+                        <input type="number" asp-for="SearchItem.MRPPriceTo" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Purchase Price From</label>
+                        <input type="number" asp-for="SearchItem.PurchasePriceFrom" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Purchase Price To</label>
+                        <input type="number" asp-for="SearchItem.PurchasePriceTo" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">WholeSale Price From</label>
+                        <input type="number" asp-for="SearchItem.WholeSalePriceFrom" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">WholeSale Price To</label>
+                        <input type="number" asp-for="SearchItem.WholeSalePriceTo" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Stock From</label>
+                        <input type="number" asp-for="SearchItem.StockFrom" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Stock To</label>
+                    <input type="number" asp-for="SearchItem.StockTo" class="form-control" />
+                </div>
+                <div class="mt-3 text-end">
+                    <button id="searchButton" type="submit" class="btn btn-primary">🔍 Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-secondary">
+            <i class="fas fa-list me-2"></i> Product List
+        </div>
+        <div class="card-body d-flex align-items-center flex-wrap justify-content-between">
+            <div class="table-responsive" style="position: relative;">
+                <table id="products" class="table table-bordered table-hover table-striped w-100">
+                    <thead>
+                        <tr>
+                            <th style="width:5%">#SN</th>
+                            <th style="width:8%">Image</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Purchase</th>
+                            <th>MRP</th>
+                            <th>Wholesale</th>
+                            <th>Stock</th>
+                            <th>Low Stock</th>
+                            <th>Damage Stock</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+    <partial name="_AddProductModal" />
+    <partial name="_StoreProductModal" />
+    <partial name="_DemageProductModal" />
+    <div id="editProductModalContainer"></div>
+    <partial name="_ModalPartial" />
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.3/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.3/js/buttons.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+<script>
+           $(document).ready(function () {
+            const table = $('#products').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: false,
+                scrollX: true,
+                autoWidth: false,
+                dom: '<"top d-flex justify-content-between"lB>rt<"bottom"ip>',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
+                ajax: {
+                    url: "/Products/GetProductsJsonDataSP",
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: function (d) {
+                        d.Name = $("#SearchItem_Name").val();
+                        d.CategoryName = $("#SearchItem_CategoryName").val();
+                        d.MRPPriceFrom = $("#SearchItem_MRPPriceFrom").val() || null;
+                        d.MRPPriceTo = $("#SearchItem_MRPPriceTo").val() || null;
+                        d.PurchasePriceFrom = $("#SearchItem_PurchasePriceFrom").val() || null;
+                        d.PurchasePriceTo = $("#SearchItem_PurchasePriceTo").val() || null;
+                        d.WholeSalePriceFrom = $("#SearchItem_WholeSalePriceFrom").val() || null;
+                        d.WholeSalePriceTo = $("#SearchItem_WholeSalePriceTo").val() || null;
+                        d.StockFrom = $("#SearchItem_StockFrom").val() || null;
+                        d.StockTo = $("#SearchItem_StockTo").val() || null;
+                        return JSON.stringify(d);
+                    }
+                },
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    {
+                        data: "imagePath", render: function (data) {
+                            if (!data) return "No Image";
+                            return `<img src="${data}" style="height: 50px; border-radius: 6px;" />`;
+                        }
+                    },
+                    { data: "code" },
+                    { data: "name" },
+                    { data: "categoryName" },
+                    { data: "purchasePrice", render: $.fn.dataTable.render.number(',', '.', 2, '$') },
+                    { data: "mrpPrice", render: $.fn.dataTable.render.number(',', '.', 2, '$') },
+                    { data: "wholesalePrice", render: $.fn.dataTable.render.number(',', '.', 2, '$') },
+                    { data: "stock" },
+                    { data: "lowStock" },
+                    { data: "damageStock" },
+                    {
+                        data: "id", orderable: false, render: function (id) {
+                            return `
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Action</button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="/Products/View/${id}"><i class="fas fa-eye me-2"></i>View</a></li>
+                                        <li><a class="dropdown-item" href="/Products/barcode/${id}"><i class="fas fa-barcode me-2"></i>Barcode</a></li>
+                                        <li><button class="dropdown-item text-primary edit-product-btn" data-id="${id}"><i class="fas fa-edit me-2"></i>Edit</button></li>
+                                        <li><button class="dropdown-item text-danger delete-product-btn" data-id="${id}"><i class="fas fa-trash me-2"></i>Delete</button></li>
+                                    </ul>
+                                </div>`;
+                        }
+                    }
+                ]
+            });
+
+            // Dropdown toggle fix
+            $(document).on('click', '.dropdown-toggle', function (e) {
+                e.stopPropagation();
+                const $currentMenu = $(this).next('.dropdown-menu');
+                $('.dropdown-menu').not($currentMenu).removeClass('show');
+                $currentMenu.toggleClass('show');
+            });
+
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown-menu').removeClass('show');
+                }
+            });
+
+            // Delete Modal
+            $('#products').on('click', '.delete-product-btn', function () {
+                const id = $(this).data("id");
+                $('#modal-delete .modal-body p').text("Are you sure to delete this product?");
+                $('#delete-id').val(id);
+                $('#delete-form').attr('action', '/admin/products/delete');
+                new bootstrap.Modal(document.getElementById('modal-delete')).show();
+            });
+
+            $('#delete-button').click(function () {
+                const id = $('#delete-id').val();
+                const token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: `/products/delete/${id}`,
+                    type: 'POST',
+                    headers: { 'RequestVerificationToken': token },
+                    success: function () {
+                        const modalEl = document.getElementById('modal-delete');
+                        bootstrap.Modal.getInstance(modalEl).hide();
+                        table.ajax.reload(null, false);
+                        alert('Product deleted successfully.');
+                    },
+                    error: function () {
+                        alert('Failed to delete product.');
+                    }
+                });
+            });
+
+            // Add Product Modal: Select2 init
+            // $('#addProductModal').on('shown.bs.modal', function () {
+            //     $('#categorySelect').select2({
+            //         dropdownParent: $('#addProductModal'),
+            //         placeholder: "Select or add a category",
+            //         ajax: {
+            //             url: '/Products/SearchCategories',
+            //             dataType: 'json',
+            //             delay: 250,
+            //             data: params => ({ query: params.term }),
+            //             processResults: data => ({ results: data })
+            //         }
+            //     }).on('select2:select', function (e) {
+            //         $('#newCategoryWrapper').toggle(e.params.data.id === 'add_new');
+            //     });
+
+            //     $('#unitSelect').select2({
+            //         dropdownParent: $('#addProductModal'),
+            //         placeholder: "Select or add a unit",
+            //         ajax: {
+            //             url: '/Products/SearchUnits',
+            //             dataType: 'json',
+            //             delay: 250,
+            //             data: params => ({ query: params.term }),
+            //             processResults: data => {
+            //                 const units = data.map(u => ({ id: u.id, text: u.text }));
+            //                 units.push({ id: '00000000-0000-0000-0000-000000000000', text: '➕ Add new unit' });
+            //                 return { results: units };
+            //             }
+            //         }
+            //     }).on('select2:select', function (e) {
+            //         $('#newUnitWrapper').toggle(e.params.data.id === '00000000-0000-0000-0000-000000000000');
+            //     });
+            // });
+
+
+
+        $('.open-add-modal').on('click', function () {
+            const modal = new bootstrap.Modal(document.getElementById('addProductModal'));
+            modal.show();
+        });
+
+        // When Add Product Modal is fully shown
+        $('#addProductModal').on('shown.bs.modal', function () {
+            // Initialize Select2 for Category
+            $('#categorySelect').select2({
+                dropdownParent: $('#addProductModal'),
+                placeholder: "Select or add a category",
+                ajax: {
+                    url: '/Products/SearchCategories',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({ query: params.term }),
+                    processResults: data => ({ results: data })
+                }
+            }).on('select2:select', function (e) {
+                $('#newCategoryWrapper').toggle(e.params.data.id === 'add_new');
+            });
+
+            // Initialize Select2 for Unit
+            $('#unitSelect').select2({
+                dropdownParent: $('#addProductModal'),
+                placeholder: "Select or add a unit",
+                ajax: {
+                    url: '/Products/SearchUnits',
+                    dataType: 'json',
+                    delay: 250,
+                    data: params => ({ query: params.term }),
+                    processResults: data => {
+                        const units = data.map(u => ({ id: u.id, text: u.text }));
+                        units.push({ id: '00000000-0000-0000-0000-000000000000', text: '➕ Add new unit' });
+                        return { results: units };
+                    }
+                }
+            }).on('select2:select', function (e) {
+                $('#newUnitWrapper').toggle(e.params.data.id === '00000000-0000-0000-0000-000000000000');
+            });
+        });
+
+            // Submit Add Product
+            $('#addProductForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '/Products/Add',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        alert('Product added successfully.');
+                        bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
+                        table.ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON?.message || 'Failed to add product.');
+                    }
+                });
+            });
+
+            // Open Store Modal
+            $('.open-store-modal').on('click', function () {
+                const modal = new bootstrap.Modal(document.getElementById('storeProductModal'));
+                modal.show();
+
+                if (!$('#storeProductSelect').hasClass('select2-hidden-accessible')) {
+                    $('#storeProductSelect').select2({
+                        dropdownParent: $('#storeProductModal'),
+                        placeholder: "Select a product",
+                        allowClear: true,
+                        ajax: {
+                            url: '/Products/SearchProductsForDropdown',
+                            type: "GET",
+                            dataType: 'json',
+                            delay: 250,
+                            data: params => ({ query: params.term }),
+                            processResults: data => ({ results: data })
+                        }
+                    });
+                }
+            });
+
+            // Submit Store Product
+            $('#StoreProduct').on('click', function () {
+                $.ajax({
+                    url: '/Products/AddStoreProduct',
+                    method: 'POST',
+                    data: $('#storeProductForm').serialize(),
+                    success: function (res) {
+                        alert(res.message || 'Product stored successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('storeProductModal')).hide();
+                        table.ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON?.message || 'Product store failed.');
+                    }
+                });
+            });
+
+            // Open Damage Modal
+            $('.open-damage-modal').on('click', function () {
+                const modal = new bootstrap.Modal(document.getElementById('damageProductModal'));
+                modal.show();
+
+                if (!$('#damageProductSelect').hasClass('select2-hidden-accessible')) {
+                    $('#damageProductSelect').select2({
+                        dropdownParent: $('#damageProductModal'),
+                        placeholder: "Select a product",
+                        allowClear: true,
+                        ajax: {
+                            url: '/Products/SearchProductsForDropdown',
+                            type: "GET",
+                            dataType: 'json',
+                            delay: 250,
+                            data: params => ({ query: params.term }),
+                            processResults: data => ({ results: data })
+                        }
+                    });
+                }
+            });
+
+            // Submit Damage Product
+            $('#demageProduct').on('click', function () {
+                $.ajax({
+                    url: '/Products/AddStoreProduct',
+                    method: 'POST',
+                    data: $('#damageProductForm').serialize(),
+                    success: function (res) {
+                        alert(res.message || 'Product marked as damaged!');
+                        bootstrap.Modal.getInstance(document.getElementById('damageProductModal')).hide();
+                        table.ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON?.message || 'Failed to mark damage.');
+                    }
+                });
+            });
+
+            $(document).on('click', '.edit-product-btn', function () {
+                const productId = $(this).data("id");
+                $.ajax({
+                    url: `/products/edit/${productId}`,
+                    type: 'GET',
+                    success: function (html) {
+                        $('#editProductModalContainer').html(html);
+                        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+                        modal.show();
+
+                        $('#editProductModal #categorySelect').select2({
+                            dropdownParent: $('#editProductModal'),
+                            ajax: {
+                                url: '/Products/SearchCategories',
+                                dataType: 'json',
+                                delay: 250,
+                                data: params => ({ query: params.term }),
+                                processResults: data => ({ results: data })
+                            }
+                        });
+
+                        $('#editProductModal #unitSelect').select2({
+                            dropdownParent: $('#editProductModal'),
+                            ajax: {
+                                url: '/Products/SearchUnits',
+                                dataType: 'json',
+                                delay: 250,
+                                data: params => ({ query: params.term }),
+                                processResults: data => ({ results: data })
+                            }
+                        });
+                    },
+                    error: function () {
+                        alert("Failed to load product data.");
+                    }
+                });
+            });
+
+            $(document).on('submit', '#editProductForm', function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '/Products/Update',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        alert('Product Update successfully.');
+                        bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+                        table.ajax.reload();
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON?.message || 'Failed to Update product.');
+                    }
+                });
+            });
+
+            // Modal cleanup
+            function forceCleanupModals() {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+                $('.modal').each(function () {
+                    $(this).removeClass('show fade').css('display', 'none').attr('aria-hidden', 'true');
+                });
+                $('.modal select').each(function () {
+                    if ($(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2('destroy');
+                    }
+                });
+                $('.modal form').each(function () {
+                    this.reset();
+                });
+            }
+
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                forceCleanupModals();
+            });
+
+            // Search reload
+            $('#searchForm').on('submit', function (e) {
+                e.preventDefault();
+                table.ajax.reload();
+            });
+        });
+
+
+
+</script>
+
+}
+

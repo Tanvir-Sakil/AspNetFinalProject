@@ -1,0 +1,75 @@
+﻿@using DevSkill.Inventory.Application.Features.Products.Commands
+@model ProductAddCommand
+
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <form id="addProductForm"
+              enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Product Code</label>
+                        <input type="text" class="form-control" name="Code"  />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Name" class="form-label">Product Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Category</label>
+                        <select id="categorySelect" name="CategoryId" class="form-control" style="width: 100%"></select>
+                        <div id="newCategoryWrapper" style="display: none;" class="mt-2">
+                            <input type="text" id="newCategoryName" name="NewCategoryName" class="form-control" placeholder="Enter new category name" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Unit</label>
+                        <select id="unitSelect" name="UnitId" class="form-control" style="width:100%"></select>
+                        <div id="newUnitWrapper" style="display: none;" class="mt-2">
+                            <input type="text" id="newUnitName" name="NewUnitName" class="form-control" placeholder="Enter new unit name" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Purchase Price</label>
+                        <input type="number" class="form-control" name="PurchasePrice" step="0.01" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">MRP Price</label>
+                        <input type="number" class="form-control" name="MRP" step="0.01" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Wholesale Price</label>
+                        <input type="number" class="form-control" name="WholesalePrice" step="0.01" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Low Stock</label>
+                        <input type="number" class="form-control" name="LowStock" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Product Image</label>
+                        <input type="file" name="ProductImage" class="form-control" accept="image/*" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

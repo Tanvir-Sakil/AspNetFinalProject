@@ -1,0 +1,37 @@
+﻿@using DevSkill.Inventory.Application.Features.CashAccounts.Commands
+@model CashAccountUpdateCommand
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit CashAccount</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editCashAccountForm" action = "" method="post" >
+                <div class="modal-body">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <div class="form-group">
+                        <label>CashAccount Name</label>
+                        <input type="text" name="Name" value="@Model.Name" class="form-control" required />
+                        <input type="number" name="Balance" value="@Model.Balance" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="IsActive" class="form-control">
+                            <option value="true" selected="@(Model.IsActive ? "selected" : null)">Active</option>
+                            <option value="false" selected="@(!Model.IsActive ? "selected" : null)">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div> 

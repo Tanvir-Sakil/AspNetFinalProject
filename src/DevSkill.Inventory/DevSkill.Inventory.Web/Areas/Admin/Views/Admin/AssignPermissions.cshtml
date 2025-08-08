@@ -1,0 +1,189 @@
+﻿@using DevSkill.Inventory.Web.Areas.Admin.Models
+@model AssignPermissionViewModel
+
+<style>
+    .permission-wrapper {
+        margin-left: 20px; 
+        padding: 20px 30px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header input[type="checkbox"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .list-unstyled li {
+        margin-bottom: 6px;
+    }
+
+    .page_box {
+        padding: 10px 15px;
+    }
+
+    .form-section {
+        margin-bottom: 1.8rem;
+    }
+
+    .btn-primary {
+        padding: 10px 28px;
+        font-size: 1rem;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+        font-weight: 500;
+        font-size: 1.05rem;
+    }
+
+    .text-end.mt-4 {
+        text-align: center !important;
+        margin-top: 2rem !important;
+    }
+
+    @@media (max-width: 768px) {
+        .permission-wrapper
+
+    {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .form-section {
+        margin-bottom: 1.2rem;
+    }
+
+    }
+</style>
+   <div class="permission-wrapper">
+        <form asp-action="AssignPermissions" method="post">
+            <input type="hidden" name="UserId" value="@Model.UserId" />
+
+            <div class="row">
+                <div class="col-md-4 form-section">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <input type="checkbox" onclick="toggleGroup(this, 'product-perms')" /> Products
+                        </div>
+                        <div class="card-body page_box" id="product-perms">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                    <td><input type="checkbox" name="Permissions" value="Product.View" @(Model.Permissions.Contains("Product.View") ? "checked" : "") /> Products List</td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                            <li><input type="checkbox" name="Permissions" value="Product.Edit" @(Model.Permissions.Contains("Product.Edit") ? "checked" : "") /> Edit</li>
+                                            <li><input type="checkbox" name="Permissions" value="Product.Add" @(Model.Permissions.Contains("Product.Add") ? "checked" : "") /> Add</li>
+                                            <li><input type="checkbox" name="Permissions" value="Product.Create" @(Model.Permissions.Contains("Product.Store") ? "checked" : "") /> Store</li>
+                                            <li><input type="checkbox" name="Permissions" value="Product.Delete" @(Model.Permissions.Contains("Product.Delete") ? "checked" : "") /> Delete</li>
+                                            <li><input type="checkbox" name="Permissions" value="Product.Barcode" @(Model.Permissions.Contains("Product.Barcode") ? "checked" : "") /> Barcode</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                    <td><input type="checkbox" name="Permissions" value="Product.New" @(Model.Permissions.Contains("Product.View") ? "checked" : "") /> New Product</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 form-section">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <input type="checkbox" onclick="toggleGroup(this, 'customer-perms')" /> Customer
+                        </div>
+                        <div class="card-body page_box" id="customer-perms">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                    <td><input type="checkbox" name="Permissions" value="Customer.View" @(Model.Permissions.Contains("Customer.View") ? "checked" : "") /> Customer List</td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                            <li><input type="checkbox" name="Permissions" value="Customer.Create @(Model.Permissions.Contains("Customer.Add") ? "checked" : "")  /> Add</li>
+                                            <li><input type="checkbox" name="Permissions" value="Customer.Edit" @(Model.Permissions.Contains("Customer.Edit") ? "checked" : "") /> Edit</li>
+                                            <li><input type="checkbox" name="Permissions" value="Customer.Delete" @(Model.Permissions.Contains("Customer.Delete") ? "checked" : "") /> Delete</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 form-section">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <input type="checkbox" onclick="toggleGroup(this, 'sales-perms')" /> Sales
+                        </div>
+                        <div class="card-body page_box" id="sales-perms">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                    <td><input type="checkbox" name="Permissions" value="Sales.View" @(Model.Permissions.Contains("Sales.View") ? "checked" : "") /> Sales List</td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                            <li><input type="checkbox" name="Permissions" value="Sales.Create" @(Model.Permissions.Contains("Sales.View") ? "checked" : "") /> Add</li>
+                                            <li><input type="checkbox" name="Permissions" value="Sales.Edit" @(Model.Permissions.Contains("Sales.Edit") ? "checked" : "") /> Edit</li>
+                                            <li><input type="checkbox" name="Permissions" value="Sales.Delete" @(Model.Permissions.Contains("Sales.Delete") ? "checked" : "") /> Delete</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 form-section">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <input type="checkbox" onclick="toggleGroup(this, 'balancetransfer-perms')" /> Balance Transfer
+                        </div>
+                        <div class="card-body page_box" id="balancetransfer-perms">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                    <td><input type="checkbox" name="Permissions" value="BalanceTransfer.View" @(Model.Permissions.Contains("BalanceTransfer.View") ? "checked" : "") /> View Transfer</td>
+                                        <td>
+                                            <ul class="list-unstyled">
+                                            <li><input type="checkbox" name="Permissions" value="BalanceTransfer.Create" @(Model.Permissions.Contains("BalanceTransfer.Add") ? "checked" : "") /> Add</li>
+                                            <li><input type="checkbox" name="Permissions" value="BalanceTransfer.Edit" @(Model.Permissions.Contains("BalanceTransfer.Edit") ? "checked" : "") /> Edit</li>
+                                            <li><input type="checkbox" name="Permissions" value="BalanceTransfer.Delete" @(Model.Permissions.Contains("BalanceTransfer.Delete") ? "checked" : "") /> Delete</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+      </div>
+
+<script>
+    function toggleGroup(mainCheckbox, sectionId) {
+        const section = document.getElementById(sectionId);
+        const inputs = section.querySelectorAll('input[type="checkbox"]');
+        inputs.forEach(cb => cb.checked = mainCheckbox.checked);
+    }
+</script>

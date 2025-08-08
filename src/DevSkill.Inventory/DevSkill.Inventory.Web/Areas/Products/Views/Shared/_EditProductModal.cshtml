@@ -1,0 +1,102 @@
+﻿@model DevSkill.Inventory.Application.Features.Products.Commands.ProductUpdateCommand
+
+<div class="modal fade" id="editProductModal" tabindex="-1"
+   aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <form id="editProductForm"
+              enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editProductModalLabel">✏️ Update Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Code" class="form-label">Code</label>
+                        <input asp-for="Code" class="form-control" />
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Name" class="form-label">Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Category</label>
+                        <select class="form-control" id="categorySelect" name="CategoryId" style="width: 100%">
+                            <option value="@Model.CategoryId" selected="selected">Current Category</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Unit</label>
+                        <select class="form-control" id="unitSelect" name="UnitId" style="width: 100%">
+                            <option value="@Model.UnitId" selected="selected">Current Unit</option>
+                        </select>
+                        <span asp-validation-for="UnitId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PurchasePrice" class="form-label">Purchase Price</label>
+                        <input asp-for="PurchasePrice" class="form-control" />
+                        <span asp-validation-for="PurchasePrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="MRP" class="form-label">MRP Price</label>
+                        <input asp-for="MRP" class="form-control" />
+                        <span asp-validation-for="MRP" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="WholesalePrice" class="form-label">Wholesale Price</label>
+                        <input asp-for="WholesalePrice" class="form-control" />
+                        <span asp-validation-for="WholesalePrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Stock" class="form-label">Stock</label>
+                        <input asp-for="Stock" class="form-control" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="LowStock" class="form-label">Low Stock</label>
+                        <input asp-for="LowStock" class="form-control" />
+                        <span asp-validation-for="LowStock" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Demage" class="form-label">Damage Stock</label>
+                        <input asp-for="Demage" class="form-control" />
+                        <span asp-validation-for="Demage" class="text-danger"></span>
+                    </div>
+
+                    <input type="hidden" asp-for="ImagePath" />
+                    <input type="hidden" asp-for="ImageFileName" />
+                    <input type="hidden" asp-for="ImageFile" />
+                    <div class="col-md-6">
+                        <label class="form-label">Product Image</label>
+                        <input type="file" name="ProductImage" class="form-control" accept="image/*" />
+@*                         @if (Model != null && !string.IsNullOrEmpty(Model.ImagePath))
+                        {
+                            <img src="@Model.ImagePath" alt="Product Image" style="height: 50px; margin-top: 10px; border-radius: 4px;" />
+                        } *@
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">💾 Update</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

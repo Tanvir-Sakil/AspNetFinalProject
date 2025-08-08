@@ -1,0 +1,23 @@
+﻿@using DevSkill.Inventory.Application.Features.Departments.Commands
+@model AddDepartmentCommand
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Department Information</h3>
+    </div>
+    <div class="card-body">
+        <form id="createDepartmentForm">
+            <div class="form-group">
+                <label>Department Name *</label>
+                <input type="text" name="Name" class="form-control" placeholder="Department Name" required />
+            </div>
+            <input type="hidden" name="IsActive" value="true" />
+            <div class="form-group">
+                <button type="submit" class="form-control btn btn-primary" style="margin-top: 3px;">
+                    <i class="far fa-save"></i>&nbsp;&nbsp;Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+

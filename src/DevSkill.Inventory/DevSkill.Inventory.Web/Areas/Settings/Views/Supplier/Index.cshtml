@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Supplier List";
+}
+
+@section Styles {
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+<h2>Suppliers</h2>
+
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#supplierModal">
+    <i class="fas fa-plus"></i> New Supplier
+</button>
+
+<table id="supplierTable" class="display table table-bordered">
+    <thead>
+        <tr>
+            <th>#SN</th>
+             <th>ID</th>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Mobile</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="supplierModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="supplierForm">
+                <div class="modal-header">
+                    <h4 class="modal-title">Supplier Information</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-2" name="SupplierName" placeholder="Supplier Name" required />
+                    <input type="text" class="form-control mb-2" name="Mobile" placeholder="Mobile" required maxlength="11" minlength="11" />
+                    <input type="text" class="form-control mb-2" name="Company" placeholder="Company" />
+                    <input type="email" class="form-control mb-2" name="Email" placeholder="Email" />
+                    <input type="text" class="form-control mb-2" name="Address" placeholder="Address" />
+                    <input type="text" class="form-control mb-2" name="OpeningBalance" placeholder="Opening Balance" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-danger" data--bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        const table = $('#supplierTable').DataTable({
+            ajax: '/Admin/Supplier/GetAll',
+            columns: [
+                { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                { data: 'id' },
+                { data: 'supplierName' },
+                { data: 'company' },
+                { data: 'mobile' },
+                { data: 'address' },
+                { data: 'status' },
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return `<button class="btn btn-sm btn-danger">Delete</button>`;
+                    }
+                }
+            ]
+        });
+
+        $('#supplierForm').submit(function (e) {
+            e.preventDefault();
+            const formData = {
+                SupplierName: $('input[name="SupplierName"]').val(),
+                Mobile: $('input[name="Mobile"]').val(),
+                Company: $('input[name="Company"]').val(),
+                Email: $('input[name="Email"]').val(),
+                Address: $('input[name="Address"]').val(),
+                OpeningBalance: $('input[name="OpeningBalance"]').val()
+            };
+
+            $.ajax({
+                url: '/Admin/Supplier/Add',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function () {
+                    $('#supplierModal').modal('hide');
+                    table.ajax.reload();
+                }
+            });
+        });
+    </script>
+}
+
+

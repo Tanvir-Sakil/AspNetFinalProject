@@ -1,0 +1,105 @@
+﻿@using DevSkill.Inventory.Application.Features.Customers.Commands
+@model CustomerAddCommand
+@{
+    ViewData["Title"] = "Add";
+}
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Add Customer</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Customer</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content Header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row g-4">
+            <!--begin::Col-->
+            <div class="col-12">
+                <partial name="_ResponsePartial" />
+            </div>
+            <!--end::Col-->
+            <!--begin::Col-->
+            <div class="col-md-6">
+                <!--begin::Quick Example-->
+                <div class="card card-primary card-outline mb-4">
+                    <!--begin::Header-->
+                    <div class="card-header"><div class="card-title">Add a new Customer</div></div>
+                    <!--end::Header-->
+                    <!--begin::Form-->
+                    <form asp-antiforgery="true" asp-area="Admin" asp-controller="Customers"
+                          asp-action="Add" method="post">
+                        <!--begin::Body-->
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label">Name</label>
+                                <input type="text"
+                                       class="form-control"
+                                       asp-for="Name"
+                                       aria-describedby="NameHelp" />
+                                <div id="NameHelp" class="form-text">
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                    Provide a Customer Name
+                                </div>
+                            </div>
+@*                             <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Customer's Description</label>
+                                <input type="text"
+                                       class="form-control"
+                                       asp-for="Description"
+                                       aria-describedby="descriptionHelp" />
+                                <div id="descriptionHelp" class="form-text">
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                    Provide a Description
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Rating" class="form-label">Customer's Rating</label>
+                                <input type="number"
+                                       class="form-control"
+                                       asp-for="Rating"
+                                       aria-describedby="ratingHelp" />
+                                <div id="ratingHelp" class="form-text">
+                                    <span asp-validation-for="Rating" class="text-danger"></span>
+                                    Provide  rating
+                                </div>
+                            </div> *@
+                        </div>
+                        <!--end::Body-->
+                        <!--begin::Footer-->
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                        <!--end::Footer-->
+                    </form>
+                    <!--end::Form-->
+                </div>
+                <!--end::Quick Example-->
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content-->
+ </div>
+@section Scripts
+{
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

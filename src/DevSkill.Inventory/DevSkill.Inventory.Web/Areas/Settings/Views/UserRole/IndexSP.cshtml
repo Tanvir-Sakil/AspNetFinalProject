@@ -1,0 +1,243 @@
+﻿@using DevSkill.Inventory.Web.Areas.Settings.Models
+@model UserRoleListModel
+
+@{
+    ViewData["Title"] = "UserRoles";
+
+}
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css">
+}
+<div class="col-12" style="margin-left: 2px;">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-search mr-1"></i>Search UserRole</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" asp-for="SearchItem.RoleName" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" asp-for="SearchItem.CompanyName" class="form-control">
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <input type="text" asp-for="SearchItem.Status" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>Create Date From</label>
+                        <input type="datetime" asp-for="SearchItem.CreateDateFrom" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>Create Date To</label>
+                        <input type="datetime" asp-for="SearchItem.CreateDateTo" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button id="searchButton" type="submit" class="btn btn-primary float-right">Search</button>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-left: 2px;">
+    <div class="col-md-8">
+        <div id="userRoleTable">
+            <table id="userRoles" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#SN</th>
+                        <th>Role Name</th>
+                        <th>Company Name</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div id="createForm">
+            <partial name="_UserRoleAddForm" />
+        </div>
+    </div>
+</div>
+<div id="editModalContainer">
+</div>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+            $(document).ready(function () {
+                var table = $('#userRoles').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    lengthChange: true,
+                    searching: false,
+                    autoWidth: false,
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, 'All']
+                    ],
+                    layout: {
+                            topStart: ['pageLength','buttons']
+                    },
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ],
+                    ajax: {
+                        url: '/Settings/Role/GetUserRoleListJson',
+                        type: 'POST',
+                        contentType: "application/json",
+                        dataType: "json",
+                        data:function(d)
+                        {
+                            d.SearchItem={
+                                Name: $("#SearchItem_Name").val(),
+                                CompanyName: $("#SearchItem_CompanyName").val(),
+                                Status: $("#SearchItem_Status").val(),
+                                CreateDateFrom: $("#SearchItem_CreateDateFrom").val() === ""? null : $("#SearchItem_CreateDateFrom").val(),
+                                CreateDateTo: $("#SearchItem_CreateDateTo").val() === "" ? null : $("#SearchItem_CreateDateTo").val()
+
+                            };
+                            return JSON.stringify(d);
+                        }
+                    },
+                    columns: [
+                        { data: 'serialNumber' },
+                        { data: 'name' },
+                        { data: 'companyName'},
+                        { data: 'isActive', render: function (data) {
+                            return data ? 'Active' : 'Inactive';
+                        }},
+                        { data: 'createdDate' },
+                        {
+                            data: 'id',
+                            orderable: false,
+                            render: function (data) {
+                                return `<div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">Action</button>
+                                    <div class="dropdown-menu">
+                                         <button class="dropdown-item text-primary edit-btn" data-id="${data}"><i class="fas fa-edit me-2"></i>Edit</button>
+                                        <button class="dropdown-item text-danger show-bs-modal delete-btn" data-id="${data}"><i class="fas fa-trash me-2"></i>Delete</button>
+                                    </div>
+                                </div>`
+                            }
+                        }
+                    ]
+                });
+                $(document).on('submit', '#createUserRoleForm', function (e) {
+                   // e.preventDefault();
+                    $.ajax({
+                        url: '/Settings/Role/Add',
+                        type: 'POST',
+                        data: $(this).serialize(),
+                        success: function () {
+                            table.ajax.reload(null, false);
+                            $('#createUserRoleForm')[0].reset();
+                        },
+                        error: () => alert("Error while creating userRole")
+                    });
+                });
+                $(document).on("click", ".edit-btn", function () {
+                const id = $(this).data("id");
+                $.get(`/Settings/Role/GetUserRole/${id}`, function (modalHtml) {
+                    $('#editModalContainer').html(modalHtml);
+                    const modalEl = document.getElementById('editModal');
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                });
+            });
+            $(document).on("click", ".delete-btn", function () {
+                const id = $(this).data("id");
+                if (confirm("Are you sure to delete?")) {
+                    $.post(`/Settings/Role/Delete`, { id }, function () {
+                        table.ajax.reload(null, false);
+                    });
+                }
+            });
+            $("#searchButton").click(function () {
+            $('#userRoles').DataTable().ajax.reload(null, false);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('submit', '#editUserRoleForm', function (e) {
+            e.preventDefault();
+
+            const Data = {
+                id: $('#editUserRoleForm [name="Id"]').val(),
+                roleName: $('#editUserRoleForm [name="RoleName"]').val(),
+                isActive: $('#editUserRoleForm [name="IsActive"]').val() === "true"
+            };
+
+            $.ajax({
+                url: '/Settings/Role/Edit',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(Data),
+                success: function (res) {
+                    console.log("Update response:", res);
+                    const modalEl = document.getElementById('editModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    $('#userRoles').DataTable().ajax.reload(null, false);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Update failed:", xhr.responseText);
+                    alert("Error while updating userRole");
+                }
+            });
+        });
+
+            $(document).on('click', '.dropdown-toggle', function (e) {
+                e.stopPropagation();
+                const $currentMenu = $(this).next('.dropdown-menu');
+                $('.dropdown-menu').not($currentMenu).removeClass('show');
+                 $currentMenu.toggleClass('show');
+            });
+
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    $('.dropdown-menu').removeClass('show');
+                }
+            });
+    </script>
+}
+

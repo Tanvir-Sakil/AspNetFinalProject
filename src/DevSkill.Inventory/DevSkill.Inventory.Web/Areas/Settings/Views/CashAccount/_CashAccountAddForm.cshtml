@@ -1,0 +1,25 @@
+﻿@using DevSkill.Inventory.Application.Features.CashAccounts.Commands
+@model AddCashAccountCommand
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Cash Account Information</h3>
+    </div>
+    <div class="card-body">
+        <form id="createCashAccountForm">
+            <div class="form-group">
+                <label>Account Name *</label>
+                <input type="text" name="Name" class="form-control" placeholder="Account Name" required />
+
+                <label>Balance</label>
+                <input type="number" name="Balance" class="form-control" placeholder="Balance"  />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="form-control btn btn-primary" style="margin-top: 3px;">
+                    <i class="far fa-save"></i>&nbsp;&nbsp;Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+

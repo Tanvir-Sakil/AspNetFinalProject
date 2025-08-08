@@ -1,0 +1,309 @@
+﻿@{
+    ViewData["Title"] = "Staff";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        h3 {
+            font-weight: 700;
+            color: #343a40;
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, #28a745, #218838);
+            border: none;
+            font-weight: 600;
+        }
+
+            .btn-success:hover {
+                background: linear-gradient(to right, #218838, #1e7e34);
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            }
+
+        .card {
+            border-radius: 0.75rem;
+        }
+
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            background: linear-gradient(to right, #007bff, #0056b3);
+            color: white;
+            text-align: center;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.6em;
+        }
+
+        .edit-staff-btn {
+            border: none;
+            background: none;
+            font-weight: 500;
+            padding: 0.2rem 0.5rem;
+        }
+
+            .edit-staff-btn:hover {
+                text-decoration: underline;
+            }
+
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 6px;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+        }
+
+        .dataTables_wrapper .dt-buttons .btn {
+            background-color: #007bff !important;
+            color: white !important;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+            .dataTables_wrapper .dt-buttons .btn:hover {
+                background-color: #0056b3 !important;
+            }
+
+        .modal-header {
+            background: linear-gradient(to right, #007bff, #0056b3);
+            color: white;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+}
+
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-0">👨‍💼 Staff Management</h3>
+        </div>
+        <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+            <i class="fas fa-plus-circle me-1"></i> Add New Staff
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0"><i class="fas fa-users me-2"></i> Staff List</h3>
+        </div>
+        <div class="card-body">
+            <table id="staffTable" class="table table-striped table-hover table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th>#SN.</th>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Joining Date</th>
+                        <th>Salary</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<partial name="_AddStaffModal" />
+<partial name="_ModalPartial" />
+<div id="editStaffModalContainer"></div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
+
+    <script>
+        $(function () {
+            const table = $('#staffTable').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                autoWidth: false,
+                scrollX: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
+                layout: {
+                    topStart: ['pageLength', 'buttons'],
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                ajax: {
+                    url: '/UserManagement/Staff/GetStaffJsonData',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: function (d) {
+                        return JSON.stringify(d);
+                    }
+                },
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: "staffCode" },
+                    { data: "employeeName" },
+                    { data: "phone" },
+                    { data: "email" },
+                    { data: "address" },
+                    {
+                        data: "joiningDate",
+                        render: function (data) {
+                            if (!data) return '';
+                            const date = new Date(data);
+                            const options = {
+                                year: 'numeric',
+                                month: 'short',
+                                day: '2-digit',
+                                timeZone: 'Asia/Dhaka'
+                            };
+                            return date.toLocaleDateString('en-GB', options);
+                        }
+                    },
+                    { data: "salary" },
+                    {
+                        data: "isActive",
+                        render: data =>
+                            data ? '<span class="badge bg-success">Active</span>' :
+                                   '<span class="badge bg-danger">Inactive</span>'
+                    },
+                    {
+                        data: "id",
+                        render: data => `
+                            <div class="btn-group" role="group">
+                                <button class="edit-staff-btn text-primary" data-id="${data}" title="Edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class='btn btn-outline-danger btn-sm delete-staff' data-id='${data}' title="Delete">
+                                    <i class='fas fa-trash'></i> Delete
+                                </button>
+                            </div>
+                        `
+                    }
+                ]
+            });
+        });
+
+        $(document).ready(function () {
+            $.getJSON('/Settings/Department/GetAllDepartments', function (data) {
+                let options = '<option value="">Select One</option>';
+                $.each(data, (i, dept) => {
+                    options += `<option value="${dept.id}">${dept.name}</option>`;
+                });
+                $('#departmentDropdown').html(options);
+            });
+
+            $('#staffForm').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/UserManagement/Staff/Add',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function () {
+                        alert('Staff added successfully!');
+                        $('#addStaffModal').modal('hide');
+                        $('#staffTable').DataTable().ajax.reload();
+                    }
+                });
+            });
+        });
+
+        $(document).on('click', '.edit-staff-btn', function () {
+            const id = $(this).data("id");
+            $.ajax({
+                url: `/UserManagement/Staff/Edit/${id}`,
+                type: 'GET',
+                success: function (html) {
+                    $('#editStaffModalContainer').html(html);
+                    const modal = new bootstrap.Modal(document.getElementById('editStaffModal'));
+                    modal.show();
+                },
+                error: function () {
+                    alert("Failed to load staff data.");
+                }
+            });
+        });
+
+        $(document).on('submit', '#editStaffForm', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            $.ajax({
+                url: '/UserManagement/Staff/Update',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    alert('Staff updated successfully.');
+                    bootstrap.Modal.getInstance(document.getElementById('editStaffModal')).hide();
+                    $('#staffTable').DataTable().ajax.reload();
+                },
+                error: function (xhr) {
+                    alert(xhr.responseJSON?.message || 'Failed to update staff.');
+                }
+            });
+        });
+
+        $('#staffTable').on('click', '.delete-staff', function () {
+            const id = $(this).data("id");
+            $('#modal-delete .modal-body p').text("Are you sure to delete this Staff?");
+            $('#delete-id').val(id);
+            $('#delete-form').attr('action', '/UserManagement/Staff/delete');
+            new bootstrap.Modal(document.getElementById('modal-delete')).show();
+        });
+
+        $('#delete-button').click(function () {
+            const id = $('#delete-id').val();
+            const token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: `/UserManagement/Staff/delete/${id}`,
+                type: 'POST',
+                headers: { 'RequestVerificationToken': token },
+                success: function () {
+                    const modalEl = document.getElementById('modal-delete');
+                    bootstrap.Modal.getInstance(modalEl).hide();
+                    $('#staffTable').DataTable().ajax.reload(null, false);
+                    alert('Staff deleted successfully.');
+                },
+                error: function () {
+                    alert('Failed to delete Staff.');
+                }
+            });
+        });
+    </script>
+}

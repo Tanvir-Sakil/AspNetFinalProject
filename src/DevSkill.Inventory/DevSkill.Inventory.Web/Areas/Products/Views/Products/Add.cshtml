@@ -1,0 +1,154 @@
+﻿@* @using DevSkill.Inventory.Application.Features.Products.Commands
+@model ProductAddCommand
+
+@{
+    ViewData["Title"] = "Add Product";
+}
+
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Add Product</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--begin::App Content-->
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row g-4">
+            <div class="col-12">
+                <partial name="_ResponsePartial" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">Add a new Product</div>
+                    </div>
+
+                    <form asp-antiforgery="true" asp-area="Admin" asp-controller="Products"
+                          asp-action="Add" enctype="multipart/form-data" method="post">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" asp-for="Name" />
+                                <div class="form-text">Provide a Product Name</div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CustomerId" class="form-label">Company</label>
+                                <select asp-for="CustomerId" class="form-control select2-company" style="width: 100%;">
+                                    <option value="">-- Select Company --</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Unit</label>
+                                <select id="unitSelect" name="UnitId" class="form-control" style="width:100%"></select>
+                            </div>
+
+                            <div class="mb-3" id="newUnitWrapper" style="display: none;">
+                                <input type="text" id="newUnitName" name="NewUnitName" class="form-control" placeholder="Enter new unit name" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Description</label>
+                                <textarea class="form-control" asp-for="Description" rows="3"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Price" class="form-label">Price</label>
+                                <input type="number" class="form-control" asp-for="Price" step="0.01" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="PublishedAt" class="form-label">Published Date</label>
+                                <input type="date" class="form-control" asp-for="PublishedAt" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Product Image</label>
+                            <input type="file" name="ProductImage" class="form-control" />
+                        </div>
+
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+     $('.select2-company').select2({
+    placeholder: "Search for a company",
+    minimumInputLength: 2,
+    allowClear: true,
+    ajax: {
+        url: "/Admin/Products/Search", 
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                query: params.term
+            };
+        },
+        processResults: function (data) {
+            return {
+                results: data
+            };
+        }
+    }
+    });
+    </script>
+
+    <script>
+        $('#unitSelect').select2({
+            placeholder: "Select or add a unit",
+            ajax: {
+                url: '/Admin/Products/SearchUnits', // You will create this
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { query: params.term };
+                },
+                processResults: function (data) {
+                    const items = data.map(u => ({ id: u.id, text: u.text }));
+                    items.push({ id: '00000000-0000-0000-0000-000000000000', text: '➕ Add new unit2...' });
+                    return { results: items };
+                }
+            }
+        });
+
+        $('#unitSelect').on('select2:select', function (e) {
+            if (e.params.data.id === '00000000-0000-0000-0000-000000000000') {
+                $('#newUnitWrapper').show();
+            } else {
+                $('#newUnitWrapper').hide();
+            }
+        });
+    </script>
+
+}
+ *@
